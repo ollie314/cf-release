@@ -1,36 +1,31 @@
 ---
 name: collector
+
+description: "The collector will discover the various components on the message bus and query their `/healthz` and `/varz` interfaces. The metric data collected is published to collector plugins such as OpenTSDB, AWS CloudWatch and DataDog."
+
 templates:
   collector_ctl.erb: bin/collector_ctl
   config.yml.erb: config/config.yml
-  syslog_forwarder.conf.erb: config/syslog_forwarder.conf
+
 packages:
 - common
 - collector
-- ruby
-- syslog_aggregator
-properties:
-  syslog_aggregator.address:
-    description: "IP address for syslog aggregator"
-  syslog_aggregator.port:
-    description: "TCP port of syslog aggregator"
-  syslog_aggregator.all:
-    description: "Define whether forwarders should send all their syslog data to our aggregator."
-    default: false
-  syslog_aggregator.transport:
-    description: "Transport to be used when forwarding logs (tcp|udp|relp)."
-    default: "tcp"
+- ruby-2.1.8
 
-  collector.aws_access_key_id:
+properties:
+  collector.aws.access_key_id:
     description: "AWS access key for CloudWatch access"
-  collector.aws_secret_access_key:
+  collector.aws.secret_access_key:
     description: "AWS secret for CloudWatch access"
-  collector.datadog_api_key:
+  collector.datadog.api_key:
     description: "Datadog API key"
-  collector.datadog_application_key:
+  collector.datadog.application_key:
     description: "Datadog application key"
   collector.deployment_name:
-    description: "name for this bosh deployment. All metrics will be tagged with deployment:XXX when sending them to CloudWatch and Datadog"
+    description: "name for this bosh deployment. All metrics will be tagged with deployment:XXX when sending them to CloudWatch, Datadog and Graphite"
+  collector.logging_level:
+    description: "the logging level for the collector"
+    default: info
   collector.intervals.discover:
     description: "the interval in seconds that the collector attempts to discover components"
     default: 60
@@ -58,15 +53,25 @@ properties:
   collector.use_tsdb:
     description: "enable OpenTsdb plugin"
     default: false
-  nats.address:
-    description: "NATS address"
+  collector.opentsdb.address:
+    description: "IP address of OpenTsdb"
+  collector.opentsdb.port:
+    description: "TCP port of OpenTsdb"
+  collector.use_graphite:
+    description: "enable Graphite plugin"
+    default: false
+  collector.graphite.address:
+    description: "IP address of Graphite"
+  collector.graphite.port:
+    description: "TCP port of Graphite"
+  collector.memory_threshold:
+    description: "Memory threshold for collector restart (Mb)"
+    default: 800
+  nats.machines:
+    description: "IP of each NATS cluster member."
   nats.password:
     description: "NATS password"
   nats.port:
     description: "NATS TCP port"
   nats.user:
     description: "NATS user"
-  opentsdb.address:
-    description: "IP address of OpenTsdb"
-  opentsdb.port:
-    description: "TCP port of OpenTsdb"

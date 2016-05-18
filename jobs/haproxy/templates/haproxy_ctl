@@ -1,17 +1,14 @@
-#!/bin/sh
-#
-
-set -e
+#!/bin/bash -e
 
 PATH=/var/vcap/packages/haproxy/bin:$PATH
+LOG_DIR=/var/vcap/sys/log/haproxy
 
 NAME=haproxy
 DAEMON=$(which haproxy)
-CONFIG=/var/vcap/jobs/haproxy/config/haproxy.config
+CONFIG=/var/vcap/jobs/haproxy/config/haproxy.conf
+SYSLOG_CONFIG=/var/vcap/jobs/haproxy/config/haproxy_syslog.conf
 DESC="HAProxy"
 USER=vcap
-
-INIT_LOG_DIR=/var/vcap/sys/log/haproxy
 
 PID_FILE=/var/vcap/sys/run/haproxy/pid
 
@@ -21,6 +18,8 @@ test -x "${DAEMON}"
 test -f "${CONFIG}"
 
 RETVAL=0
+
+source /var/vcap/packages/common/utils.sh
 
 ensure_dir() {
     DIR=$1
@@ -33,12 +32,22 @@ ensure_dir() {
 
 ensure_dirs() {
     ensure_dir "$(dirname "${PID_FILE}")"
-    ensure_dir "${INIT_LOG_DIR}"
 }
 
 remove_pid() {
     rm -f "${PID_FILE}"
     rmdir "$(dirname "${PID_FILE}")" || :
+}
+
+configure_syslog() {
+    if [ ! -d "${LOG_DIR}" ] ; then
+        mkdir -p "${LOG_DIR}"
+        chown -R "syslog":"adm" "${LOG_DIR}"
+        chmod 755 "${LOG_DIR}"
+    fi
+
+    cp $SYSLOG_CONFIG /etc/rsyslog.d/01-haproxy_syslog.conf
+    /usr/sbin/service rsyslog restart
 }
 
 start_haproxy() {
@@ -48,24 +57,22 @@ start_haproxy() {
     else
         RETVAL=0
         ensure_dirs
-        echo "$("${TIMESTAMP}"): Starting HAProxy" >> "${INIT_LOG_DIR}/startup_stdout.log"
+        configure_syslog
+        echo "$("${TIMESTAMP}"): Starting HAProxy"
         set +e
-        "${DAEMON}" -f "${CONFIG}" -D -p "${PID_FILE}" \
-            1>> "${INIT_LOG_DIR}/startup_stdout.log" \
-            2>> "${INIT_LOG_DIR}/startup_stderr.log" \
-            0<&-
+        "${DAEMON}" -f "${CONFIG}" -D -p "${PID_FILE}" 0<&-
         RETVAL=$?
         set -e
         case "${RETVAL}" in
             0)
-                echo "$("${TIMESTAMP}"): Finished starting HAProxy" >> "${INIT_LOG_DIR}/startup_stdout.log"
+                echo "$("${TIMESTAMP}"): Finished starting HAProxy"
                 echo "SUCCESS"
                 ;;
             *)
-                echo "$("${TIMESTAMP}"): Errored starting HAProxy" >> "${INIT_LOG_DIR}/startup_stdout.log"
-                echo "$("${TIMESTAMP}"): Errored starting HAProxy" >> "${INIT_LOG_DIR}/startup_stderr.log"
+                echo "$("${TIMESTAMP}"): Errored starting HAProxy"
+                echo "$("${TIMESTAMP}"): Errored starting HAProxy" >&2
                 remove_pid
-                echo "FAILED - check ${INIT_LOG_DIR}/startup_std*.log"
+                echo "FAILED - check logs"
                 RETVAL=1
                 ;;
         esac
@@ -113,6 +120,34 @@ restart_haproxy() {
     start_haproxy
 }
 
+reload_haproxy() {
+    status_haproxy
+    if [ "${RETVAL}" = 0 ]; then
+        RETVAL=0
+        ensure_dirs
+        echo "$("${TIMESTAMP}"): reloading HAProxy"
+        set +e
+        "${DAEMON}" -f "${CONFIG}" -p "${PID_FILE}" -D -sf $(cat $PID_FILE) 0<&-
+        RETVAL=$?
+        set -e
+        case "${RETVAL}" in
+            0)
+                echo "$("${TIMESTAMP}"): Finished reloading HAProxy"
+                echo "SUCCESS"
+                ;;
+            *)
+                echo "$("${TIMESTAMP}"): Errored reloading HAProxy"
+                echo "$("${TIMESTAMP}"): Errored reloading HAProxy" >&2
+                remove_pid
+                echo "FAILED - check logs"
+                RETVAL=1
+                ;;
+        esac
+    else
+        echo "HAProxy is not currently running"
+    fi
+}
+
 case "$1" in
     start)
         echo -n "Starting ${DESC}: "
@@ -127,7 +162,12 @@ case "$1" in
     status)
         status_haproxy
         ;;
-    force-reload|reload|restart)
+    reload)
+        echo -n "Reloading ${DESC}: "
+        reload_haproxy
+        echo "${NAME}."
+        ;;
+    force-reload|restart)
         echo -n "Restarting ${DESC}: "
         restart_haproxy
         echo "${NAME}."

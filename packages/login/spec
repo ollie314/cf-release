@@ -1,9 +1,0 @@
----
-name: login
-dependencies:
-- ruby
-files:
-- login/**/*
-- uaa/**/*
-- maven/**/*
-- cf-registrar-bundle-for-identity/**/*

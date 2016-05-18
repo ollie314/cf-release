@@ -1,11 +1,11 @@
 
-SCRIPT=$(basename $0)
-mkdir -p /var/vcap/sys/log/monit
+mkdir -p /var/vcap/sys/log
 
-exec 1>> /var/vcap/sys/log/monit/$SCRIPT.log
-exec 2>> /var/vcap/sys/log/monit/$SCRIPT.err.log
+exec > >(tee -a >(logger -p user.info -t vcap.$(basename $0).stdout) | awk -W interactive '{lineWithDate="echo [`date +\"%Y-%m-%d %H:%M:%S%z\"`] \"" $0 "\""; system(lineWithDate)  }' >>/var/vcap/sys/log/$(basename $0).log)
+exec 2> >(tee -a >(logger -p user.error -t vcap.$(basename $0).stderr) | awk -W interactive '{lineWithDate="echo [`date +\"%Y-%m-%d %H:%M:%S%z\"`] \"" $0 "\""; system(lineWithDate)  }' >>/var/vcap/sys/log/$(basename $0).err.log)
 
 pid_guard() {
+  echo "------------ STARTING `basename $0` at `date` --------------" | tee /dev/stderr
   pidfile=$1
   name=$2
 
@@ -83,55 +83,6 @@ kill_and_wait() {
   wait_pidfile $pidfile 1 $timeout $force
 }
 
-check_mount() {
-  opts=$1
-  exports=$2
-  mount_point=$3
-
-  if grep -qs $mount_point /proc/mounts; then
-    echo "Found NFS mount $mount_point"
-  else
-    echo "Mounting NFS..."
-    mount $opts $exports $mount_point
-    if [ $? != 0 ]; then
-      echo "Cannot mount NFS from $exports to $mount_point, exiting..."
-      exit 1
-    fi
-  fi
-}
-
-# Check the syntax of a sudoers file.
-check_sudoers() {
-  /usr/sbin/visudo -c -f "$1"
-}
-
-# Check the syntax of a sudoers file and if it's ok install it.
-install_sudoers() {
-  src="$1"
-  dest="$2"
-
-  check_sudoers "$src"
-
-  if [ $? -eq 0 ]; then
-    chown root:root "$src"
-    chmod 0440 "$src"
-    cp -p "$src" "$dest"
-  else
-    echo "Syntax error in sudoers file $src"
-    exit 1
-  fi
-}
-
-# Add a line to a file if it is not already there.
-file_must_include() {
-  file="$1"
-  line="$2"
-
-  # Protect against empty $file so it doesn't wait for input on stdin.
-  if [ -n "$file" ]; then
-    grep --quiet "$line" "$file" || echo "$line" >> "$file"
-  else
-    echo 'File name is required'
-    exit 1
-  fi
+running_in_container() {
+  grep -q -E '/instance|/docker/' /proc/self/cgroup
 }
