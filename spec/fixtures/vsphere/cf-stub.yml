@@ -38,7 +38,6 @@ networks:
         name: VSPHERE_NETWORK_NAME_2
 
 properties:
-  domain: DOMAIN
   system_domain: SYSTEM_DOMAIN
   system_domain_organization: SYSTEM_DOMAIN_ORGANIZATION
   app_domains:
@@ -60,7 +59,6 @@ properties:
     secure_link:
       secret: blobstore-secret
     tls:
-      port: 443
       cert: BLOBSTORE_TLS_CERT
       private_key: BLOBSTORE_PRIVATE_KEY
       ca_cert: BLOBSTORE_CA_CERT
@@ -113,7 +111,14 @@ properties:
       signing_key: JWT_SIGNING_KEY
     scim:
       users:
-      - admin|ADMIN_PASSWORD|scim.write,scim.read,openid,cloud_controller.admin,doppler.firehose
+      - name: admin
+        password: ADMIN_PASSWORD
+        groups:
+        - scim.write
+        - scim.read
+        - openid
+        - cloud_controller.admin
+        - doppler.firehose
 
   ccdb:
     roles:

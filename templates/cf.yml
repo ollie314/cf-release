@@ -15,7 +15,6 @@ jobs:
     resource_pool: small_z1
     default_networks:
     - name: cf1
-      static_ips: ~
     networks: (( merge || default_networks ))
     update:
       serial: true
@@ -34,7 +33,6 @@ jobs:
     resource_pool: small_z2
     default_networks:
     - name: cf2
-      static_ips: ~
     networks: (( merge || default_networks ))
     update:
       serial: true
@@ -52,7 +50,6 @@ jobs:
     resource_pool: router_z1
     default_networks:
       - name: cf1
-        static_ips: ~
     networks: (( merge || default_networks ))
     properties:
       ha_proxy:
@@ -66,9 +63,9 @@ jobs:
     templates: (( merge || meta.nats_templates ))
     instances: 1
     resource_pool: medium_z1
-    networks:
+    default_networks:
       - name: cf1
-        static_ips: (( merge || nil ))
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z1
@@ -78,9 +75,9 @@ jobs:
     templates: (( merge || meta.nats_templates ))
     instances: 1
     resource_pool: medium_z2
-    networks:
+    default_networks:
       - name: cf2
-        static_ips: (( merge || nil ))
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z2
@@ -91,12 +88,17 @@ jobs:
     instances: 2
     persistent_disk: 10024
     resource_pool: medium_z1
-    networks:
+    default_networks:
       - name: cf1
-        static_ips: (( merge || nil ))
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z1
+      consul:
+        agent:
+          services:
+            etcd:
+              name: cf-etcd
     update:
       serial: true
       max_in_flight: 1
@@ -106,12 +108,17 @@ jobs:
     instances: 1
     persistent_disk: 10024
     resource_pool: medium_z2
-    networks:
+    default_networks:
       - name: cf2
-        static_ips: (( merge || nil ))
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z2
+      consul:
+        agent:
+          services:
+            etcd:
+              name: cf-etcd
     update:
       serial: true
       max_in_flight: 1
@@ -120,8 +127,9 @@ jobs:
     templates: (( merge || meta.stats_templates ))
     instances: 1
     resource_pool: small_z1
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z1
@@ -132,9 +140,9 @@ jobs:
     instances: 0
     resource_pool: medium_z1
     persistent_disk: 102400
-    networks:
+    default_networks:
       - name: cf1
-        static_ips: ~
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -151,9 +159,9 @@ jobs:
     instances: 0
     resource_pool: medium_z1
     persistent_disk: 102400
-    networks:
+    default_networks:
       - name: cf1
-        static_ips: ~
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -170,9 +178,9 @@ jobs:
     instances: 0
     resource_pool: medium_z1
     persistent_disk: 4096
-    networks:
+    default_networks:
     - name: cf1
-      static_ips: ~
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z1
@@ -182,8 +190,9 @@ jobs:
     templates: (( merge || meta.uaa_templates ))
     instances: 1
     resource_pool: medium_z1
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -202,8 +211,9 @@ jobs:
     templates: (( merge || meta.uaa_templates ))
     instances: 1
     resource_pool: medium_z2
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -223,8 +233,9 @@ jobs:
     instances: 1
     resource_pool: large_z1
     persistent_disk: 0
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -241,8 +252,9 @@ jobs:
     instances: 1
     resource_pool: large_z2
     persistent_disk: 0
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -259,8 +271,9 @@ jobs:
     instances: 1
     resource_pool: medium_z1
     persistent_disk: 0
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z1
@@ -271,8 +284,9 @@ jobs:
     instances: 1
     resource_pool: small_z1
     persistent_disk: 0
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z1
@@ -284,8 +298,9 @@ jobs:
     instances: 1
     resource_pool: small_z2
     persistent_disk: 0
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
       metron_agent:
         zone: z2
@@ -296,8 +311,9 @@ jobs:
     templates: (( merge || meta.hm9000_templates ))
     instances: 1
     resource_pool: medium_z1
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -313,8 +329,9 @@ jobs:
     templates: (( merge || meta.hm9000_templates ))
     instances: 1
     resource_pool: medium_z2
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
       consul:
         agent:
@@ -330,9 +347,9 @@ jobs:
     templates: (( merge || meta.dea_templates ))
     instances: 1
     resource_pool: runner_z1
-    networks:
+    default_networks:
       - name: cf1
-        static_ips: ~
+    networks: (( merge || default_networks ))
     properties:
       dea_next:
         zone: (( merge || "z1" ))
@@ -354,9 +371,9 @@ jobs:
     templates: (( merge || meta.dea_templates ))
     instances: 1
     resource_pool: runner_z2
-    networks:
+    default_networks:
       - name: cf2
-        static_ips: ~
+    networks: (( merge || default_networks ))
     properties:
       dea_next:
         zone: (( merge || "z2" ))
@@ -378,8 +395,9 @@ jobs:
     templates: (( merge || meta.loggregator_templates ))
     instances: 0
     resource_pool: medium_z1
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       doppler:
         zone: z1
@@ -391,8 +409,9 @@ jobs:
     templates: (( merge || meta.loggregator_templates ))
     instances: 0
     resource_pool: medium_z2
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
       doppler:
         zone: z2
@@ -404,8 +423,9 @@ jobs:
     templates: (( merge || meta.loggregator_templates ))
     instances: 1
     resource_pool: medium_z1
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       doppler:
         zone: z1
@@ -417,8 +437,9 @@ jobs:
     templates: (( merge || meta.loggregator_templates ))
     instances: 1
     resource_pool: medium_z2
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
       doppler:
         zone: z2
@@ -430,11 +451,19 @@ jobs:
     templates: (( merge || meta.loggregator_trafficcontroller_templates ))
     instances: 1
     resource_pool: small_z1
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
+      loggregator:
+        uaa:
+          client_secret: (( .properties.uaa.clients.doppler.secret ))
       traffic_controller:
         zone: z1
+      consul:
+        agent:
+          services:
+            loggregator_trafficcontroller: {}
       metron_agent:
         zone: z1
       route_registrar:
@@ -445,11 +474,19 @@ jobs:
     templates: (( merge || meta.loggregator_trafficcontroller_templates ))
     instances: 1
     resource_pool: small_z2
-    networks:
+    default_networks:
       - name: cf2
+    networks: (( merge || default_networks ))
     properties:
+      loggregator:
+        uaa:
+          client_secret: (( .properties.uaa.clients.doppler.secret ))
       traffic_controller:
         zone: z2
+      consul:
+        agent:
+          services:
+            loggregator_trafficcontroller: {}
       metron_agent:
         zone: z2
       route_registrar:
@@ -462,7 +499,6 @@ jobs:
     resource_pool: router_z1
     default_networks:
       - name: cf1
-        static_ips: ~
     networks: (( merge || default_networks ))
     properties:
       consul:
@@ -479,7 +515,6 @@ jobs:
     resource_pool: router_z2
     default_networks:
       - name: cf2
-        static_ips: ~
     networks: (( merge || default_networks ))
     properties:
       consul:
@@ -497,8 +532,9 @@ jobs:
     instances: 1
     resource_pool: small_errand
     lifecycle: errand
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
 
   - name: smoke_tests
     templates:
@@ -507,8 +543,9 @@ jobs:
     instances: 0
     resource_pool: small_errand
     lifecycle: errand
-    networks:
+    default_networks:
       - name: cf1
+    networks: (( merge || default_networks ))
     properties:
       <<: (( merge ))
 
@@ -518,12 +555,12 @@ properties:
   app_ssh: ~
 
   blobstore:
-    port: (( merge || 80 ))
+    port: (( merge || 8080 ))
     admin_users: (( merge || nil ))
     secure_link:
       secret: (( merge || nil ))
     tls:
-      port: (( merge || 443 ))
+      port: (( merge || 4443 ))
       cert: ~
       private_key: ~
       ca_cert: ~
@@ -546,12 +583,11 @@ properties:
 
   support_address: (( merge || "http://support.cloudfoundry.com" ))
   description: null
-  domain: (( merge ))
   ssl:
     skip_cert_verify: (( merge || false ))
-  system_domain: (( domain ))
+  system_domain: (( merge ))
   system_domain_organization: ~
-  app_domains: (( [domain] ))
+  app_domains: (( [system_domain] ))
 
   disk_quota_enabled: true
 
@@ -569,15 +605,30 @@ properties:
 
   etcd:
     machines: (( merge || jobs.etcd_z1.networks.cf1.static_ips jobs.etcd_z2.networks.cf2.static_ips ))
-    require_ssl: false
-    peer_require_ssl: false
-    advertise_urls_dns_suffix: (( merge || "etcd.service.cf.internal" ))
+    require_ssl: (( merge || false ))
+    peer_require_ssl: (( .properties.etcd.require_ssl ))
+    advertise_urls_dns_suffix: cf-etcd.service.cf.internal
+    ca_cert: (( merge || "" ))
+    client_cert: (( merge || "" ))
+    client_key: (( merge || "" ))
+    cluster:
+      - instances: (( jobs.etcd_z1.instances ))
+        name: etcd_z1
+      - instances: (( jobs.etcd_z2.instances ))
+        name: etcd_z2
+    peer_ca_cert: (( merge || "" ))
+    peer_cert: (( merge || "" ))
+    peer_key: (( merge || "" ))
+    server_cert: (( merge || "" ))
+    server_key: (( merge || "" ))
 
   etcd_metrics_server:
-    nats:
-      machines: (( .properties.nats.machines ))
-      username: (( .properties.nats.user ))
-      password: (( .properties.nats.password ))
+    etcd:
+      require_ssl: (( .properties.etcd.require_ssl ))
+      ca_cert: (( .properties.etcd.ca_cert ))
+      client_cert: (( .properties.etcd.client_cert ))
+      client_key: (( .properties.etcd.client_key ))
+      dns_suffix: (( .properties.etcd.advertise_urls_dns_suffix ))
 
   dea_next:
     memory_overcommit_factor: null
@@ -619,7 +670,9 @@ properties:
     tls:
       ca_cert: ~
     etcd:
-      machines: (( .properties.etcd.machines ))
+      machines: [(( .properties.etcd.advertise_urls_dns_suffix ))]
+      require_ssl: (( .properties.etcd.require_ssl ))
+      ca_cert: (( .properties.etcd.ca_cert ))
 
   loggregator_endpoint:
     shared_secret: (( merge ))
@@ -637,6 +690,9 @@ properties:
       server_key: ~
       port: ~
       enable: ~
+    etcd:
+      client_cert: (( .properties.etcd.client_cert ))
+      client_key: (( .properties.etcd.client_key ))
 
   doppler_endpoint:
     shared_secret: (( .properties.loggregator_endpoint.shared_secret ))
@@ -644,8 +700,10 @@ properties:
   metron_agent:
     deployment: (( meta.environment ))
     preferred_protocol: ~
-    enable_buffer: ~
-    buffer_size: ~
+    protocols: ~
+    etcd:
+      client_cert: (( .properties.etcd.client_cert ))
+      client_key: (( .properties.etcd.client_key ))
     tls:
       client_cert: ~
       client_key: ~
@@ -659,8 +717,16 @@ properties:
     disable_access_control: (( merge || nil ))
     security_event_logging:
       enabled: (( merge || false ))
+    etcd:
+      client_cert: (( .properties.etcd.client_cert ))
+      client_key: (( .properties.etcd.client_key ))
 
   logger_endpoint: ~
+
+  syslog_drain_binder:
+    etcd:
+      client_cert: (( .properties.etcd.client_cert ))
+      client_key: (( .properties.etcd.client_key ))
 
   cc:
     jobs:
@@ -709,7 +775,7 @@ properties:
     system_hostnames: ~
     external_host: api
     external_port: 9022
-    srv_api_uri: (( "https://" external_host "." domain ))
+    srv_api_uri: (( "https://" external_host "." system_domain ))
 
     bulk_api_password: (( merge ))
     internal_api_user: "internal_user"
@@ -734,15 +800,17 @@ properties:
     resource_pool:
       blobstore_type: (( merge || "webdav" ))
       webdav_config: (( merge || properties.cc.webdav_config ))
-      resource_directory_key: (( domain "-cc-resources" ))
+      resource_directory_key: (( system_domain "-cc-resources" ))
       fog_connection: ~
+      fog_aws_storage_options: ~
       cdn: ~
 
     packages:
       blobstore_type: (( merge || "webdav" ))
       webdav_config: (( merge || properties.cc.webdav_config ))
-      app_package_directory_key: (( domain "-cc-packages" ))
+      app_package_directory_key: (( system_domain "-cc-packages" ))
       fog_connection: ~
+      fog_aws_storage_options: ~
       cdn: ~
       max_package_size: 1073741824
       max_valid_packages_stored: ~
@@ -750,8 +818,9 @@ properties:
     droplets:
       blobstore_type: (( merge || "webdav" ))
       webdav_config: (( merge || properties.cc.webdav_config ))
-      droplet_directory_key: (( domain "-cc-droplets" ))
+      droplet_directory_key: (( system_domain "-cc-droplets" ))
       fog_connection: ~
+      fog_aws_storage_options: ~
       cdn: ~
       max_staged_droplets_stored: ~
 
@@ -770,8 +839,9 @@ properties:
     buildpacks:
       blobstore_type: (( merge || "webdav" ))
       webdav_config: (( merge || properties.cc.webdav_config ))
-      buildpack_directory_key: (( domain "-cc-buildpacks" ))
+      buildpack_directory_key: (( system_domain "-cc-buildpacks" ))
       fog_connection: ~
+      fog_aws_storage_options: ~
       cdn: ~
     quota_definitions: (( merge || meta.default_quota_definitions ))
     default_quota_definition: default
@@ -817,8 +887,9 @@ properties:
     external_protocol: ~
 
     webdav_config:
-      private_endpoint: "https://blobstore.service.cf.internal"
-      public_endpoint: (( "http://blobstore." domain || nil))
+      blobstore_timeout: 5
+      private_endpoint: "https://blobstore.service.cf.internal:4443"
+      public_endpoint: (( "http://blobstore." system_domain || nil))
       username: ((  properties.blobstore.admin_users.[0].username || nil ))
       password: ((  properties.blobstore.admin_users.[0].password || nil ))
       ca_cert: ((  properties.blobstore.tls.ca_cert || nil ))
@@ -826,6 +897,7 @@ properties:
     reserved_private_domains: ~
 
     dea_use_https: false
+    minimum_candidate_stagers: (( merge || nil ))
     volume_services_enabled: (( merge || nil ))
 
     security_event_logging:
@@ -836,15 +908,22 @@ properties:
   ha_proxy: (( merge || nil ))
 
   hm9000:
-    url: (( "https://hm9000." domain ))
+    url: (( "https://hm9000." system_domain ))
     port: 5155
     ca_cert:
     server_cert:
     server_key:
     client_cert:
     client_key:
+    etcd:
+      machines: [(( .properties.etcd.advertise_urls_dns_suffix ))]
+      require_ssl: (( .properties.etcd.require_ssl ))
+      ca_cert: (( .properties.etcd.ca_cert ))
+      client_cert: (( .properties.etcd.client_cert ))
+      client_key: (( .properties.etcd.client_key ))
 
   login:
+    branding: (( merge || nil ))
     enabled: true
     analytics:
       code: ~
@@ -854,37 +933,33 @@ properties:
     protocol: ~
     brand: oss
     asset_base_url: ~
-    uaa_base: ~
     self_service_links_enabled: ~
-    signups_enabled: ~
-    invitations_enabled: ~
-    spring_profiles: ~
     messages: ~
 
     notifications:
       url: ~
 
     smtp:
+      <<: (( merge || nil ))
       host: ~
       port: ~
       user: ~
       password: ~
 
     links:
-      passwd: (( "https://console." domain "/password_resets/new" ))
-      signup: (( "https://console." domain "/register" ))
+      passwd: (( "https://login." system_domain "/forgot_password" ))
+      signup: (( "https://login." system_domain "/create_account" ))
 
     logout: ~
-
-    tiles: ~
 
     saml: ~
 
     restricted_ips_regex: ~
 
   uaa:
+    ca_cert: (( merge || nil ))
     catalina_opts: ~
-    url: (( "https://uaa." domain ))
+    url: (( "https://uaa." system_domain ))
     issuer: (( url ))
 
     no_ssl: ~
@@ -914,6 +989,14 @@ properties:
         lockoutAfterFailures: ~
         countFailuresWithinSeconds: ~
         lockoutPeriodSeconds: ~
+        
+    password:
+      policy:
+        minLength: ~
+        requireUpperCaseCharacter: ~
+        requireLowerCaseCharacter: ~
+        requireDigit: ~
+        requireSpecialCharacter: ~
 
     login: ~
 
@@ -921,7 +1004,6 @@ properties:
 
     newrelic: ~
     port: 8080
-    spring_profiles: ~
 
     user: ~
     clients:
@@ -932,12 +1014,12 @@ properties:
         authorities: oauth.login,scim.write,clients.read,notifications.write,critical_notifications.write,emails.write,scim.userids,password.write
         secret: (( merge ))
         authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: (( "https://login." domain ))
+        redirect-uri: (( "https://login." system_domain ))
         autoapprove: true
       cf:
         override: true
         authorized-grant-types: password,refresh_token
-        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read
+        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,cloud_controller.admin_read_only,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read,routing.router_groups.write
         authorities: uaa.none
         access-token-validity: 600
         refresh-token-validity: 2592000
@@ -972,20 +1054,24 @@ properties:
 
     database: ~
 
-    restricted_ips_regex: 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
-
-    zones: (( merge || nil ))
+    zones:
+      internal:
+        hostnames: (( merge || ["uaa.service.cf.internal"] ))
 
   uaadb: (( merge ))
 
   databases: ~
 
   router:
+    logging_level: (( merge || nil ))
+    suspend_pruning_if_nats_unavailable: (( merge || nil ))
+    enable_proxy: (( merge || nil ))
     enable_ssl: (( merge || nil ))
     ssl_cert: (( merge || nil ))
     ssl_key: (( merge || nil ))
     cipher_suites: (( merge || nil ))
     requested_route_registration_interval_in_seconds: (( merge || nil ))
+    load_balancer_healthy_threshold: (( merge || nil ))
     ssl_skip_validation: (( merge || nil ))
     port: (( merge || nil ))
     status:
@@ -997,11 +1083,13 @@ properties:
     route_services_secret_decrypt_only: (( merge || nil ))
     route_services_timeout: (( merge || nil ))
     route_services_recommend_https: (( merge || nil ))
+    tracing:
+      enable_zipkin: (( merge || nil ))
     logrotate: (( merge || nil ))
     extra_headers_to_log: (( merge || nil ))
-    debug_addr: (( merge || nil ))
+    debug_address: (( merge || nil ))
     drain_wait: (( merge || nil ))
-    skip_oauth_tls_verification: (( merge || nil ))
+    healthcheck_user_agent: (( merge || nil ))
     enable_access_log_streaming: (( merge || nil ))
 
   routing_api:
@@ -1122,6 +1210,7 @@ meta:
   capi_release_name: (( releases.capi.name || "cf" ))
   consul_release_name: (( releases.consul.name || "cf" ))
   etcd_release_name: (( releases.etcd.name || "cf" ))
+  postgres_release_name: (( releases.postgres.name || "cf" ))
   java_buildpack_release_name: (( releases.java-buildpack-release.name || "cf" ))
   go_buildpack_release_name: (( releases.go-buildpack-release.name || "cf" ))
   binary_buildpack_release_name: (( releases.binary-buildpack-release.name || "cf" ))
@@ -1151,7 +1240,7 @@ meta:
     port: (( .properties.cc.external_port ))
     registration_interval: 20s
     uris:
-    - (( "api." .properties.domain ))
+    - (( "api." .properties.system_domain ))
 
   api_consul_services:
     cloud_controller_ng: {}
@@ -1195,6 +1284,8 @@ meta:
     release: (( meta.loggregator_release_name ))
 
   clock_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: cloud_controller_clock
     release: (( meta.capi_release_name ))
   - name: metron_agent
@@ -1217,6 +1308,8 @@ meta:
     release: (( meta.loggregator_release_name ))
 
   etcd_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: etcd
     release: (( meta.etcd_release_name ))
   - name: etcd_metrics_server
@@ -1225,12 +1318,12 @@ meta:
     release: (( meta.loggregator_release_name ))
 
   ha_proxy_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: haproxy
     release: (( meta.cf_release_name ))
   - name: metron_agent
     release: (( meta.loggregator_release_name ))
-  - name: consul_agent
-    release: (( meta.consul_release_name ))
 
   hm9000_routes:
   - name: hm9000
@@ -1239,7 +1332,7 @@ meta:
     tags:
       component: HM9K
     uris:
-    - (( "hm9000." .properties.domain ))
+    - (( "hm9000." .properties.system_domain ))
 
   hm9000_templates:
   - name: consul_agent
@@ -1252,6 +1345,8 @@ meta:
     release: (( meta.cf_release_name ))
 
   loggregator_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: doppler
     release: (( meta.loggregator_release_name ))
   - name: syslog_drain_binder
@@ -1264,14 +1359,16 @@ meta:
     port: (( .properties.loggregator.outgoing_dropsonde_port ))
     registration_interval: 20s
     uris:
-    - (( "doppler." .properties.domain ))
+    - (( "doppler." .properties.system_domain ))
   - name: loggregator
     port: (( .properties.traffic_controller.outgoing_port ))
     registration_interval: 20s
     uris:
-    - (( "loggregator." .properties.domain ))
+    - (( "loggregator." .properties.system_domain ))
 
   loggregator_trafficcontroller_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: loggregator_trafficcontroller
     release: (( meta.loggregator_release_name ))
   - name: metron_agent
@@ -1280,7 +1377,10 @@ meta:
     release: (( meta.cf_release_name ))
 
   nats_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: nats
+    consumes: {nats: nil}
     release: (( meta.cf_release_name ))
   - name: nats_stream_forwarder
     release: (( meta.cf_release_name ))
@@ -1294,7 +1394,7 @@ meta:
     tags:
       component: blobstore
     uris:
-    - (( "blobstore." .properties.domain ))
+    - (( "blobstore." .properties.system_domain ))
 
   blobstore_templates:
   - name: consul_agent
@@ -1319,8 +1419,10 @@ meta:
     release: (( meta.cf_release_name ))
 
   postgres_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: postgres
-    release: (( meta.cf_release_name ))
+    release: (( meta.postgres_release_name ))
   - name: metron_agent
     release: (( meta.loggregator_release_name ))
 
@@ -1333,6 +1435,8 @@ meta:
     release: (( meta.loggregator_release_name ))
 
   stats_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: collector
     release: (( meta.cf_release_name ))
   - name: metron_agent
@@ -1345,21 +1449,21 @@ meta:
     tags:
       component: uaa
     uris:
-    - (( "uaa." .properties.domain ))
-    - (( "*.uaa." .properties.domain ))
-    - (( "login." .properties.domain ))
-    - (( "*.login." .properties.domain ))
+    - (( "uaa." .properties.system_domain ))
+    - (( "*.uaa." .properties.system_domain ))
+    - (( "login." .properties.system_domain ))
+    - (( "*.login." .properties.system_domain ))
     health_check:
       name: uaa-healthcheck
       script_path: /var/vcap/jobs/uaa/bin/health_check
 
   uaa_templates:
+  - name: consul_agent
+    release: (( meta.consul_release_name ))
   - name: uaa
     release: (( meta.uaa_release_name ))
   - name: metron_agent
     release: (( meta.loggregator_release_name ))
-  - name: consul_agent
-    release: (( meta.consul_release_name ))
   - name: route_registrar
     release: (( meta.cf_release_name ))
   - name: statsd-injector
