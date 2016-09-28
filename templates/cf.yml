@@ -87,7 +87,7 @@ jobs:
     templates: (( merge || meta.etcd_templates ))
     instances: 2
     persistent_disk: 10024
-    resource_pool: medium_z1
+    resource_pool: large_z1
     default_networks:
       - name: cf1
     networks: (( merge || default_networks ))
@@ -107,7 +107,7 @@ jobs:
     templates: (( merge || meta.etcd_templates ))
     instances: 1
     persistent_disk: 10024
-    resource_pool: medium_z2
+    resource_pool: large_z2
     default_networks:
       - name: cf2
     networks: (( merge || default_networks ))
@@ -566,6 +566,7 @@ properties:
       ca_cert: ~
 
   consul:
+    dns_config: (( merge || nil ))
     agent:
       domain: cf.internal
       log_level: (( merge || nil ))
@@ -685,6 +686,7 @@ properties:
     blacklisted_syslog_ranges: ~
     unmarshaller_count: (( merge || 5 ))
     port: (( merge || 4443 ))
+    outgoing_port: (( merge || 8081 ))
     tls:
       server_cert: ~
       server_key: ~
@@ -712,7 +714,6 @@ properties:
     shared_secret: (( .properties.loggregator_endpoint.shared_secret ))
 
   traffic_controller:
-    outgoing_port: 8080
     zone: (( merge || nil ))
     disable_access_control: (( merge || nil ))
     security_event_logging:
@@ -1051,7 +1052,12 @@ properties:
         authorities: routing.routes.read,routing.router_groups.read
         authorized-grant-types: client_credentials,refresh_token
         secret: (( merge ))
-
+      cc-service-dashboards:
+        secret: (( merge ))
+        scope: openid,cloud_controller_service_permissions.read
+        authorities: clients.read,clients.write,clients.admin
+        authorized-grant-types: authorization_code,client_credentials
+ 
     database: ~
 
     zones:
@@ -1360,11 +1366,6 @@ meta:
     registration_interval: 20s
     uris:
     - (( "doppler." .properties.system_domain ))
-  - name: loggregator
-    port: (( .properties.traffic_controller.outgoing_port ))
-    registration_interval: 20s
-    uris:
-    - (( "loggregator." .properties.system_domain ))
 
   loggregator_trafficcontroller_templates:
   - name: consul_agent

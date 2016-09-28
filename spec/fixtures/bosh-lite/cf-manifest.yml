@@ -184,7 +184,7 @@ jobs:
             name: cf-etcd
     metron_agent:
       zone: z1
-  resource_pool: medium_z1
+  resource_pool: large_z1
   templates:
   - name: consul_agent
     release: cf
@@ -213,7 +213,7 @@ jobs:
             name: cf-etcd
     metron_agent:
       zone: z2
-  resource_pool: medium_z2
+  resource_pool: large_z2
   templates:
   - name: consul_agent
     release: cf
@@ -854,11 +854,6 @@ jobs:
         registration_interval: 20s
         uris:
         - doppler.bosh-lite.com
-      - name: loggregator
-        port: 8080
-        registration_interval: 20s
-        uris:
-        - loggregator.bosh-lite.com
     loggregator:
       uaa:
         client_secret: doppler-secret
@@ -895,11 +890,6 @@ jobs:
         registration_interval: 20s
         uris:
         - doppler.bosh-lite.com
-      - name: loggregator
-        port: 8080
-        registration_interval: 20s
-        uris:
-        - loggregator.bosh-lite.com
     loggregator:
       uaa:
         client_secret: doppler-secret
@@ -3134,6 +3124,7 @@ properties:
       tag: admin
   collector: null
   consul:
+    dns_config: null
     agent:
       domain: cf.internal
       log_level: null
@@ -3481,6 +3472,7 @@ properties:
     maxRetainedLogMessages: 100
     message_drain_buffer_size: null
     port: 4443
+    outgoing_port: 8081
     tls:
       enable: null
       port: null
@@ -3794,7 +3786,6 @@ properties:
     etcd:
       client_cert: ""
       client_key: ""
-    outgoing_port: 8080
     security_event_logging:
       enabled: false
     zone: null
@@ -3820,7 +3811,7 @@ properties:
     clients:
       cc-service-dashboards:
         authorities: clients.read,clients.write,clients.admin
-        authorized-grant-types: client_credentials
+        authorized-grant-types: authorization_code,client_credentials
         scope: openid,cloud_controller_service_permissions.read
         secret: cc-broker-secret
       cc_routing:

@@ -141,7 +141,7 @@ jobs:
             name: cf-etcd
     metron_agent:
       zone: z1
-  resource_pool: medium_z1
+  resource_pool: large_z1
   templates:
   - name: consul_agent
     release: cf
@@ -171,7 +171,7 @@ jobs:
             name: cf-etcd
     metron_agent:
       zone: z2
-  resource_pool: medium_z2
+  resource_pool: large_z2
   templates:
   - name: consul_agent
     release: cf
@@ -802,11 +802,6 @@ jobs:
         registration_interval: 20s
         uris:
         - doppler.SYSTEM_DOMAIN
-      - name: loggregator
-        port: 8080
-        registration_interval: 20s
-        uris:
-        - loggregator.SYSTEM_DOMAIN
     loggregator:
       uaa:
         client_secret: DOPPLER_SECRET
@@ -844,11 +839,6 @@ jobs:
         registration_interval: 20s
         uris:
         - doppler.SYSTEM_DOMAIN
-      - name: loggregator
-        port: 8080
-        registration_interval: 20s
-        uris:
-        - loggregator.SYSTEM_DOMAIN
     traffic_controller:
       zone: z2
     loggregator:
@@ -1249,6 +1239,7 @@ properties:
       tag: admin
   collector: null
   consul:
+    dns_config: null
     agent:
       domain: cf.internal
       log_level: null
@@ -1309,6 +1300,7 @@ properties:
     maxRetainedLogMessages: 100
     message_drain_buffer_size: null
     port: 4443
+    outgoing_port: 8081
     tls:
       enable: null
       port: null
@@ -1494,7 +1486,6 @@ properties:
     etcd:
       client_cert: ""
       client_key: ""
-    outgoing_port: 8080
     security_event_logging:
       enabled: false
     zone: null
@@ -1522,6 +1513,11 @@ properties:
         authorities: routing.router_groups.read
         authorized-grant-types: client_credentials
         secret: CC_ROUTING_SECRET
+      cc-service-dashboards:
+        authorities: clients.read,clients.write,clients.admin
+        authorized-grant-types: authorization_code,client_credentials
+        scope: openid,cloud_controller_service_permissions.read
+        secret: CC_SERVICE_DASHBOARDS_SECRET
       cf:
         access-token-validity: 600
         authorities: uaa.none
@@ -1678,7 +1674,7 @@ resource_pools:
     ephemeral_disk:
       size: 65536
       type: gp2
-    instance_type: m3.medium
+    instance_type: m3.large
   env:
     bosh:
       password: $6$4gDD3aV0rdqlrKC$2axHCxGKIObs6tAmMTqYCspcdvQXh3JJcvWOY2WGb4SrdXtnCyNaWlrf3WEqvYR2MYizEGp3kMmbpwBC6jsHt0
@@ -1692,7 +1688,7 @@ resource_pools:
     ephemeral_disk:
       size: 65536
       type: gp2
-    instance_type: m3.medium
+    instance_type: m3.large
   env:
     bosh:
       password: $6$4gDD3aV0rdqlrKC$2axHCxGKIObs6tAmMTqYCspcdvQXh3JJcvWOY2WGb4SrdXtnCyNaWlrf3WEqvYR2MYizEGp3kMmbpwBC6jsHt0
